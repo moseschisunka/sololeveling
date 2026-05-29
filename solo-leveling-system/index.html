@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE SYSTEM: Solo Leveling Gym HUD</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css?v=2.2">
+    <!-- PWA Installation Manifest & Meta Protocols -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="THE SYSTEM">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#7a1aff">
+</head>
+<body class="system-theme">
+    <!-- Background glowing grid and ambient particles -->
+    <div class="ambient-glow"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- LOGIN SCREEN OVERLAY -->
+    <div id="screen-login" class="modal-backdrop">
+        <div class="modal-card glass-panel pad-xl text-center animated-zoom">
+            <div class="system-alert-tag text-glow-blue">THE SYSTEM REQUIRES IDENTIFICATION</div>
+            <h1 class="modal-title orbitron-text mt-sm">HUNTER PORTAL LOGIN</h1>
+            <p class="modal-desc mt-xs text-secondary">Enter your hunter credentials to decypt status. Unregistered signatures will be auto-validated.</p>
+            
+            <form id="form-login" class="appraisal-form mt-lg">
+                <div class="form-group">
+                    <label for="login-username">Hunter Username</label>
+                    <input type="text" id="login-username" required placeholder="e.g. Sung Jinwoo" value="Sung Jinwoo">
+                </div>
+                <div class="form-group mt-sm">
+                    <label for="login-password">System Decryption Key (Password)</label>
+                    <input type="password" id="login-password" required placeholder="••••••••" value="monarch123">
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg btn-full mt-xl">
+                    <i class="fa-solid fa-fingerprint"></i> SECURE DECRYPT SIGNATURE
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN SYSTEM CONTAINER -->
+    <div id="app-container" class="app-container hidden">
+        <!-- HEADER HUD -->
+        <header class="system-header">
+            <div class="header-logo">
+                <span class="system-tag">THE SYSTEM</span>
+                <span class="hud-tag">GYM & ACCOUNTABILITY HUD</span>
+            </div>
+            
+            <!-- Dev Quick Override Buttons -->
+            <div class="header-dev-actions">
+                <button id="dev-miss-gym" class="btn btn-danger btn-xs" title="Simulate 36 Hours Inactive - Trigger Setback Decay">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Sim 36h Miss
+                </button>
+                <button id="dev-time-skip" class="btn btn-warning btn-xs" title="Force Daily Reset">
+                    <i class="fa-solid fa-forward"></i> Sim Reset
+                </button>
+            </div>
+
+            <div class="header-clock">
+                <i class="fa-regular fa-clock"></i>
+                <span id="system-time">00:00:00</span>
+                <button id="btn-logout" class="btn btn-secondary btn-xs" style="margin-left: 10px; border-color: rgba(255, 45, 85, 0.4); color: #ff2d55; background: transparent; box-shadow: none;">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT -->
+        <div class="hud-layout">
+            <!-- LEFT PANEL: CUSTOMER STATUS HUD -->
+            <aside class="hud-left-panel">
+                <div class="player-profile-card glass-panel">
+                    <div class="profile-glow"></div>
+                    <div class="rank-badge" id="hud-hunter-rank">E</div>
+                    
+                    <div class="avatar-container">
+                        <div class="avatar-glow"></div>
+                        <i class="fa-solid fa-user-ninja avatar-icon"></i>
+                    </div>
+
+                    <div class="player-info">
+                        <h2 id="hud-player-name" class="player-name">Sung Jinwoo</h2>
+                        <div id="hud-player-title" class="player-title">The Weakest Hunter</div>
+                    </div>
+
+                    <!-- Level & EXP -->
+                    <div class="stat-progress-group">
+                        <div class="progress-labels">
+                            <span class="label">LEVEL</span>
+                            <span id="hud-level-value" class="value orbitron-text text-glow-blue">1</span>
+                        </div>
+                        <div class="exp-progress-bar-container">
+                            <div id="hud-exp-fill" class="exp-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="progress-sub-labels">
+                            <span class="label-xs">EXP PROGRESS</span>
+                            <span id="hud-exp-value" class="value-xs">0 / 100</span>
+                        </div>
+                    </div>
+
+                    <!-- HP Bar -->
+                    <div class="stat-progress-group hp-group">
+                        <div class="progress-labels">
+                            <span class="label"><i class="fa-solid fa-heart"></i> HP</span>
+                            <span id="hud-hp-value" class="value text-glow-red">100 / 100</span>
+                        </div>
+                        <div class="bar-container hp-bar-container">
+                            <div id="hud-hp-fill" class="bar-fill hp-fill" style="width: 100%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- MP Bar -->
+                    <div class="stat-progress-group mp-group">
+                        <div class="progress-labels">
+                            <span class="label"><i class="fa-solid fa-bolt"></i> MP</span>
+                            <span id="hud-mp-value" class="value text-glow-purple">50 / 50</span>
+                        </div>
+                        <div class="bar-container mp-bar-container">
+                            <div id="hud-mp-fill" class="bar-fill mp-fill" style="width: 100%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="gold-level-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">GOLD</span>
+                            <span id="hud-gold" class="summary-val text-glow-gold">0 G</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">GUILD</span>
+                            <span id="hud-guild" class="summary-val">None</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trial Deficit warning box (Faltered Resolve Penalty card) -->
+                <div id="trial-deficit-banner" class="trial-deficit-card glass-panel hidden">
+                    <div class="warning-header">
+                        <i class="fa-solid fa-triangle-exclamation warning-icon"></i>
+                        <span class="orbitron-text">FALTERED RESOLVE</span>
+                    </div>
+                    <p class="warning-desc">Missed your gym trials (36h+ inactive). Core stats are severely exhausted (-20% STR/AGI). Daily EXP & Gold deducted!</p>
+                    <button id="btn-ritual-trigger" class="btn btn-warning btn-xs btn-full mt-sm">
+                        <i class="fa-solid fa-dharmachakra"></i> BEGIN RESTORATION RITUAL
+                    </button>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="hud-tabs">
+                    <button class="tab-btn active" data-tab="status-tab">
+                        <i class="fa-solid fa-chart-line"></i> STATUS & HEALTH
+                    </button>
+                    <button class="tab-btn" data-tab="quests-tab">
+                        <i class="fa-solid fa-calendar-check"></i> DAILY GYM TRIALS
+                    </button>
+                    <button class="tab-btn" data-tab="stats-tab">
+                        <i class="fa-solid fa-circle-nodes"></i> STAT ALLOCATION
+                    </button>
+                    <button class="tab-btn" data-tab="nourishment-tab">
+                        <i class="fa-solid fa-wheat-awn"></i> NOURISHMENT & DIET
+                    </button>
+                    <button class="tab-btn" data-tab="dungeons-tab">
+                        <i class="fa-solid fa-dungeon"></i> DUNGEON GATES
+                    </button>
+                    <button class="tab-btn" data-tab="inventory-tab">
+                        <i class="fa-solid fa-box-open"></i> INVENTORY
+                    </button>
+                    <button class="tab-btn" data-tab="intellectual-tab">
+                        <i class="fa-solid fa-brain"></i> INTELLECTUAL TRIALS
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- RIGHT PANEL: DYNAMIC TAB CONTENTS -->
+            <main class="hud-main-panel">
+                <!-- TAB 1: STATUS & HEALTH -->
+                <section id="status-tab" class="tab-content active">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-address-card header-glow-icon"></i> HUNTER STATUS & APPRAISAL</h2>
+                        <span class="accent-sub">Real-world health diagnostics integrated with the leveling system</span>
+                    </div>
+
+                    <div class="grid-2-col">
+                        <!-- Health Appraisal Card -->
+                        <div class="glass-panel pad-lg">
+                            <h3 class="panel-subtitle"><i class="fa-solid fa-calculator"></i> Current Appraisal Metrics</h3>
+                            
+                            <div class="appraisal-grid">
+                                <div class="metric-box">
+                                    <div class="metric-label">BODY MASS INDEX (BMI)</div>
+                                    <div id="status-bmi" class="metric-value">22.4</div>
+                                    <div id="status-bmi-category" class="metric-sub text-glow-green">Normal Weight</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="metric-label">BASAL METABOLIC RATE (BMR)</div>
+                                    <div id="status-bmr" class="metric-value">1,750</div>
+                                    <div class="metric-sub">kcal / day (Base Burn)</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="metric-label">DAILY EXPENSES (TDEE)</div>
+                                    <div id="status-tdee" class="metric-value">2,400</div>
+                                    <div class="metric-sub">kcal / day (Total Activity)</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="metric-label">IDEAL WEIGHT RANGE</div>
+                                    <div id="status-ideal-weight" class="metric-value">62 - 76 kg</div>
+                                    <div class="metric-sub">Based on height</div>
+                                </div>
+                            </div>
+
+                            <div class="appraisal-meta">
+                                <div class="meta-row">
+                                    <span>Height:</span> <strong id="status-height">175 cm</strong>
+                                </div>
+                                <div class="meta-row">
+                                    <span>Weight:</span> <strong id="status-weight">68 kg</strong>
+                                </div>
+                                <div class="meta-row">
+                                    <span>Activity Level:</span> <strong id="status-activity-lvl">Moderately Active</strong>
+                                </div>
+                                <div class="meta-row">
+                                    <span>Core Fitness Goal:</span> <strong id="status-core-goal" class="text-glow-blue">Muscle Gain</strong>
+                                </div>
+                            </div>
+
+                            <button id="btn-recalibrate" class="btn btn-primary btn-full mt-lg">
+                                <i class="fa-solid fa-arrows-spin"></i> Recalibrate Appraisal Metrics
+                            </button>
+                        </div>
+
+                        <!-- Class & Progression Card -->
+                        <div class="glass-panel pad-lg flex-col-between">
+                            <div>
+                                <h3 class="panel-subtitle"><i class="fa-solid fa-crown"></i> Active Title & Class</h3>
+                                <div class="path-visual-card">
+                                    <div class="path-title" id="status-active-title">The Weakest Hunter</div>
+                                    <p class="path-desc" id="status-title-desc">You are at the very bottom of the food chain. The world looks down on you, but the System has chosen you. Train daily, distribute your stat points, and transcend humanity.</p>
+                                </div>
+
+                                <h3 class="panel-subtitle mt-lg"><i class="fa-solid fa-dumbbell"></i> Current Active Difficulty</h3>
+                                <div class="difficulty-indicator-panel">
+                                    <div class="difficulty-level-tag text-glow-blue" id="status-current-difficulty-name">Easy Mode (E-Rank)</div>
+                                    <p id="status-difficulty-desc">Recommended for recovery, conditioning, or beginners. Quest targets: 10 Push-ups, 10 Sit-ups, 10 Squats, 1km Run. Grants 1 Stat Point daily.</p>
+                                </div>
+                            </div>
+
+                            <div class="system-tip-box">
+                                <i class="fa-solid fa-circle-info system-tip-icon"></i>
+                                <span><strong>System Guide:</strong> Log your real-world gym workouts. Hit your daily target reps/weight to claim experience and keys, unlocking dungeon gateways! Miss a gym day for over 36 hours, and you will enter the <strong>Faltered Resolve</strong> state.</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 2: DAILY QUESTS / GYM TRIALS -->
+                <section id="quests-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-calendar-check header-glow-icon"></i> DYNAMIC DAILY QUEST: GYM TRIALS</h2>
+                        <span class="accent-sub">Create your customized workout routine and log your real-world gym weight metrics</span>
+                    </div>
+
+                    <!-- DIFFICULTY SELECTOR -->
+                    <div class="difficulty-selection-bar glass-panel">
+                        <span class="selection-label"><i class="fa-solid fa-sliders"></i> Routine Difficulty Scaling:</span>
+                        <div class="btn-group">
+                            <button id="diff-easy" class="btn btn-tab-diff active" data-diff="easy">Easy (E-Rank)</button>
+                            <button id="diff-medium" class="btn btn-tab-diff" data-diff="medium">Medium (B-Rank)</button>
+                            <button id="diff-hard" class="btn btn-tab-diff" data-diff="hard">Hard (Monarch)</button>
+                        </div>
+                    </div>
+
+                    <div class="grid-2-col mt-md">
+                        <!-- Left Panel: Workout Checklist -->
+                        <div class="glass-panel pad-lg">
+                            <div class="flex-row-between mb-sm" style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom:8px;">
+                                <h3 class="panel-subtitle" style="margin-bottom:0; border-bottom:none; padding-bottom:0;"><i class="fa-solid fa-list-check"></i> Gym Trial Exercises</h3>
+                                <button id="btn-open-add-exercise" class="btn btn-primary btn-xs">
+                                    <i class="fa-solid fa-plus-circle"></i> Add Gym Exercise
+                                </button>
+                            </div>
+                            
+                            <!-- Dynamic Workout Checklist -->
+                            <div id="dynamic-gym-list" class="exercise-list">
+                                <!-- Gym exercise cards injected dynamically -->
+                                <div class="battle-placeholder flex-col-center" style="height: 180px;">
+                                    <i class="fa-solid fa-circle-question placeholder-icon"></i>
+                                    <p class="placeholder-text">NO GYM EXERCISES ADDED</p>
+                                    <span class="placeholder-sub">Click 'Add Gym Exercise' above to customize your routine with real weights, sets, and reps!</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Holistic & Mind Quests -->
+                        <div class="glass-panel pad-lg flex-col-between">
+                            <div>
+                                <h3 class="panel-subtitle"><i class="fa-solid fa-yin-yang"></i> Mana Concentration (Meditation)</h3>
+                                <div class="meditation-box mt-sm">
+                                    <div class="meditation-circle-container">
+                                        <div id="meditation-glow-ring" class="meditation-glow-ring"></div>
+                                        <div id="meditation-timer-display" class="meditation-timer">05:00</div>
+                                        <span id="meditation-breath-prompt" class="breath-prompt">Focus Mana</span>
+                                    </div>
+                                    <div class="meditation-controls mt-sm">
+                                        <button id="btn-meditate-start" class="btn btn-primary"><i class="fa-solid fa-play"></i> Start Meditation</button>
+                                        <button id="btn-meditate-reset" class="btn btn-secondary hidden"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+                                    </div>
+                                </div>
+
+                                <div class="holistic-checkboxes mt-lg">
+                                    <h3 class="panel-subtitle"><i class="fa-solid fa-circle-check"></i> Holistic Wellness Checks</h3>
+                                    
+                                    <label class="holistic-check-item">
+                                        <input type="checkbox" id="quest-check-diet">
+                                        <span class="custom-checkbox"></span>
+                                        <span class="check-text">Follow Active Diet Regimen Instructions</span>
+                                    </label>
+                                    
+                                    <label class="holistic-check-item">
+                                        <input type="checkbox" id="quest-check-water" disabled>
+                                        <span class="custom-checkbox"></span>
+                                        <span class="check-text">Complete Hydration Goal (<span id="quest-water-progress">0/2500</span> ml logged)</span>
+                                    </label>
+                                    
+                                    <label class="holistic-check-item">
+                                        <input type="checkbox" id="quest-check-sleep">
+                                        <span class="custom-checkbox"></span>
+                                        <span class="check-text">Logged Sleep (7+ hours of "Stasis Recovery")</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="quest-footer mt-lg">
+                                <div class="time-limit-box">
+                                    <span class="label">TIME REMAINING:</span>
+                                    <span id="quest-timer" class="value orbitron-text text-glow-red">12:34:56</span>
+                                </div>
+                                <button id="btn-complete-quest" class="btn btn-success btn-full btn-lg mt-sm disabled" disabled>
+                                    <i class="fa-solid fa-award"></i> CLAIM QUEST REWARDS
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 3: STAT ALLOCATION -->
+                <section id="stats-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-circle-nodes header-glow-icon"></i> ATTRIBUTE POINT ALLOCATION</h2>
+                        <span class="accent-sub">Freely distribute earned points to modify the System's dynamic combat calculations</span>
+                    </div>
+
+                    <div class="grid-2-col">
+                        <!-- Points Distribution Panel -->
+                        <div class="glass-panel pad-lg">
+                            <div class="available-points-banner">
+                                <span class="label">AVAILABLE STAT POINTS</span>
+                                <span id="stat-available-points" class="value orbitron-text text-glow-blue">0</span>
+                            </div>
+
+                            <div class="stats-allocator-list mt-lg">
+                                <!-- STR -->
+                                <div class="allocator-item">
+                                    <div class="stat-meta">
+                                        <span class="stat-name">STRENGTH (STR)</span>
+                                        <span id="stat-str-val" class="stat-val orbitron-text text-glow-blue">10</span>
+                                    </div>
+                                    <div class="allocator-controls">
+                                        <button class="btn btn-square btn-stat-dec" data-stat="str"><i class="fa-solid fa-minus"></i></button>
+                                        <button class="btn btn-square btn-stat-inc" data-stat="str"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+
+                                <!-- AGI -->
+                                <div class="allocator-item">
+                                    <div class="stat-meta">
+                                        <span class="stat-name">AGILITY (AGI)</span>
+                                        <span id="stat-agi-val" class="stat-val orbitron-text text-glow-blue">10</span>
+                                    </div>
+                                    <div class="allocator-controls">
+                                        <button class="btn btn-square btn-stat-dec" data-stat="agi"><i class="fa-solid fa-minus"></i></button>
+                                        <button class="btn btn-square btn-stat-inc" data-stat="agi"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+
+                                <!-- VIT -->
+                                <div class="allocator-item">
+                                    <div class="stat-meta">
+                                        <span class="stat-name">VITALITY (VIT)</span>
+                                        <span id="stat-vit-val" class="stat-val orbitron-text text-glow-blue">10</span>
+                                    </div>
+                                    <div class="allocator-controls">
+                                        <button class="btn btn-square btn-stat-dec" data-stat="vit"><i class="fa-solid fa-minus"></i></button>
+                                        <button class="btn btn-square btn-stat-inc" data-stat="vit"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+
+                                <!-- SEN -->
+                                <div class="allocator-item">
+                                    <div class="stat-meta">
+                                        <span class="stat-name">SENSE (SEN)</span>
+                                        <span id="stat-sen-val" class="stat-val orbitron-text text-glow-blue">10</span>
+                                    </div>
+                                    <div class="allocator-controls">
+                                        <button class="btn btn-square btn-stat-dec" data-stat="sen"><i class="fa-solid fa-minus"></i></button>
+                                        <button class="btn btn-square btn-stat-inc" data-stat="sen"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+
+                                <!-- INT -->
+                                <div class="allocator-item">
+                                    <div class="stat-meta">
+                                        <span class="stat-name">INTELLIGENCE (INT)</span>
+                                        <span id="stat-int-val" class="stat-val orbitron-text text-glow-blue">10</span>
+                                    </div>
+                                    <div class="allocator-controls">
+                                        <button class="btn btn-square btn-stat-dec" data-stat="int"><i class="fa-solid fa-minus"></i></button>
+                                        <button class="btn btn-square btn-stat-inc" data-stat="int"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button id="btn-apply-stats" class="btn btn-success btn-full mt-lg disabled" disabled>
+                                <i class="fa-solid fa-check-double"></i> CONFIRM POINT ALLOCATION
+                            </button>
+                        </div>
+
+                        <!-- Derived Combat Stats Panel -->
+                        <div class="glass-panel pad-lg">
+                            <h3 class="panel-subtitle"><i class="fa-solid fa-shield-halved"></i> Computed Combat Status</h3>
+                            <p class="section-desc-sm">How your allocated attributes map to active capabilities in Dungeon Gate Raids.</p>
+
+                            <div class="derived-stats-list mt-md">
+                                <div class="derived-item">
+                                    <span class="derived-label">PHYSICAL ATTACK POWER</span>
+                                    <strong id="combat-atk" class="derived-val text-glow-blue">20</strong>
+                                </div>
+                                <div class="derived-item">
+                                    <span class="derived-label">CRITICAL HIT RATE</span>
+                                    <strong id="combat-crit" class="derived-val text-glow-blue">5%</strong>
+                                </div>
+                                <div class="derived-item">
+                                    <span class="derived-label">EVASION & SPEEDS</span>
+                                    <strong id="combat-dodge" class="derived-val text-glow-blue">3%</strong>
+                                </div>
+                                <div class="derived-item">
+                                    <span class="derived-label">PHYSICAL DAMAGE MITIGATION</span>
+                                    <strong id="combat-def" class="derived-val text-glow-blue">10</strong>
+                                </div>
+                                <div class="derived-item">
+                                    <span class="derived-label">SHADOW ARMY LIMIT</span>
+                                    <strong id="combat-shadow-limit" class="derived-val text-glow-purple">0 Soldiers</strong>
+                                </div>
+                            </div>
+
+                            <h3 class="panel-subtitle mt-lg"><i class="fa-solid fa-book-open"></i> Attribute Glossary</h3>
+                            <ul class="stats-glossary">
+                                <li><strong>STR</strong> boosts raw Attack Power. Crucial for slicing down high-HP gate bosses quickly.</li>
+                                <li><strong>AGI</strong> raises Evasion chance and attack speed, allowing you to avoid damage.</li>
+                                <li><strong>VIT</strong> increases maximum HP and provides flat defense reduction.</li>
+                                <li><strong>SEN</strong> spikes Critical Hit Rate, enabling explosive double-damage strikes.</li>
+                                <li><strong>INT</strong> raises Max MP, unlocking magical damage spikes and Shadow Army slots.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 4: NOURISHMENT & DIET -->
+                <section id="nourishment-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-wheat-awn header-glow-icon"></i> ELIXIRS & NOURISHMENT PROTOCOL</h2>
+                        <span class="accent-sub">Immersive diet instructions and macro tracker to fuel your physical awakening</span>
+                    </div>
+
+                    <div class="grid-2-col">
+                        <!-- Left Panel: Meal/Calorie Logger -->
+                        <div class="glass-panel pad-lg">
+                            <h3 class="panel-subtitle"><i class="fa-solid fa-drumstick-bite"></i> Daily Nutrient Intake</h3>
+                            
+                            <div class="nutrition-hud mt-sm">
+                                <div class="calorie-budget-ring">
+                                    <div class="calorie-ring-fill" id="calorie-ring-fill"></div>
+                                    <div class="calorie-ring-content">
+                                        <span id="nutrition-current-calories" class="cal-value orbitron-text text-glow-blue">0</span>
+                                        <span class="cal-slash">/</span>
+                                        <span id="nutrition-target-calories" class="cal-limit">2400</span>
+                                        <span class="cal-unit">kcal eaten</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="macros-flex mt-md">
+                                <div class="macro-progress-box">
+                                    <div class="macro-meta">
+                                        <span>PROTEIN</span>
+                                        <span><strong id="macro-prot-curr">0</strong>g / <span id="macro-prot-target">180</span>g</span>
+                                    </div>
+                                    <div class="macro-bar-wrap"><div id="macro-prot-fill" class="macro-bar-fill protein-color" style="width: 0%;"></div></div>
+                                </div>
+                                <div class="macro-progress-box">
+                                    <div class="macro-meta">
+                                        <span>CARBS</span>
+                                        <span><strong id="macro-carb-curr">0</strong>g / <span id="macro-carb-target">240</span>g</span>
+                                    </div>
+                                    <div class="macro-bar-wrap"><div id="macro-carb-fill" class="macro-bar-fill carb-color" style="width: 0%;"></div></div>
+                                </div>
+                                <div class="macro-progress-box">
+                                    <div class="macro-meta">
+                                        <span>FATS</span>
+                                        <span><strong id="macro-fat-curr">0</strong>g / <span id="macro-fat-target">80</span>g</span>
+                                    </div>
+                                    <div class="macro-bar-wrap"><div id="macro-fat-fill" class="macro-bar-fill fat-color" style="width: 0%;"></div></div>
+                                </div>
+                            </div>
+
+                            <!-- Input Forms for meal -->
+                            <form id="form-log-food" class="log-food-form mt-lg">
+                                <h4 class="form-title"><i class="fa-solid fa-plus-minus"></i> Log Nourishment Intake</h4>
+                                <div class="input-grid mt-xs">
+                                    <div class="form-group">
+                                        <label for="food-calories">Calories (kcal)</label>
+                                        <input type="number" id="food-calories" required min="0" placeholder="e.g. 450">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="food-protein">Protein (g)</label>
+                                        <input type="number" id="food-protein" required min="0" placeholder="e.g. 35">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="food-carbs">Carbs (g)</label>
+                                        <input type="number" id="food-carbs" required min="0" placeholder="e.g. 40">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="food-fats">Fats (g)</label>
+                                        <input type="number" id="food-fats" required min="0" placeholder="e.g. 10">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-full mt-sm">
+                                    <i class="fa-solid fa-utensils"></i> Register Eaten Nourishment
+                                </button>
+                                <button type="button" id="btn-reset-nutrition" class="btn btn-secondary btn-full mt-xs">
+                                    <i class="fa-solid fa-rotate-left"></i> Reset Intake Logs
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Right Panel: Diet Regimen Selection & Hydration -->
+                        <div class="glass-panel pad-lg flex-col-between">
+                            <div>
+                                <h3 class="panel-subtitle"><i class="fa-solid fa-faucet-drip"></i> Hydration Logging ("Elixirs Consumed")</h3>
+                                <div class="hydration-section mt-sm">
+                                    <div class="water-progress-visual">
+                                        <div class="glass-container">
+                                            <div id="water-fill-level" class="water-fill" style="height: 0%;"></div>
+                                            <div class="water-glass-lines"></div>
+                                        </div>
+                                        <div class="water-reading">
+                                            <span id="hydration-current" class="orbitron-text text-glow-blue">0</span>
+                                            <span class="slash">/</span>
+                                            <span id="hydration-target">2,500</span> ml
+                                        </div>
+                                    </div>
+                                    <div class="hydration-buttons mt-md">
+                                        <button class="btn btn-square btn-water" data-amount="250" title="Add small glass (250ml)"><i class="fa-solid fa-glass-water"></i> +250ml</button>
+                                        <button class="btn btn-square btn-water" data-amount="500" title="Add shaker/bottle (500ml)"><i class="fa-solid fa-bottle-water"></i> +500ml</button>
+                                        <button id="btn-water-reset" class="btn btn-square btn-secondary" title="Reset Hydration"><i class="fa-solid fa-arrows-rotate"></i></button>
+                                    </div>
+                                </div>
+
+                                <h3 class="panel-subtitle mt-lg"><i class="fa-solid fa-list-ol"></i> Select Diet Protocol</h3>
+                                <select id="diet-protocol-selector" class="system-select">
+                                    <option value="bulk">Monarch's Bulk (Muscle Gain)</option>
+                                    <option value="stealth">Shadow Stealth (Fat Loss / Conditioning)</option>
+                                    <option value="balance">Hunter's Balance (Maintenance / Wellness)</option>
+                                </select>
+
+                                <div id="diet-instructions-content" class="diet-manual-box mt-md">
+                                    <!-- Dynamic content inserted via JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 5: DUNGEON GATES -->
+                <section id="dungeons-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-dungeon header-glow-icon"></i> RED INSTANCE DUNGEONS</h2>
+                        <span class="accent-sub">Conquer Gate anomalies matching your level to obtain legendary equipment and experience points</span>
+                    </div>
+
+                    <div class="grid-2-col">
+                        <!-- Dungeon Gate Selection -->
+                        <div class="glass-panel pad-lg">
+                            <h3 class="panel-subtitle"><i class="fa-solid fa-circle-exclamation"></i> Available Dimensional Gates</h3>
+                            <p class="section-desc-sm">Entering requires matching Dungeon Keys from your Inventory. Rarity boosts difficulty & rewards.</p>
+
+                            <div class="dungeon-gates-list mt-md">
+                                <!-- E-Rank Gate -->
+                                <div class="gate-item-card glass-panel" data-gate-rank="E">
+                                    <div class="gate-rank-badge rank-e">E</div>
+                                    <div class="gate-info">
+                                        <h4 class="gate-name">Goblin Den Gate</h4>
+                                        <span class="gate-requirement">Requires: E-Rank Key | Min level: 1</span>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm btn-enter-gate" data-gate-rank="E">ENTER</button>
+                                </div>
+
+                                <!-- D-Rank Gate -->
+                                <div class="gate-item-card glass-panel" data-gate-rank="D">
+                                    <div class="gate-rank-badge rank-d">D</div>
+                                    <div class="gate-info">
+                                        <h4 class="gate-name">Giant Swamp Spider Nest</h4>
+                                        <span class="gate-requirement">Requires: D-Rank Key | Min level: 10</span>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm btn-enter-gate" data-gate-rank="D">ENTER</button>
+                                </div>
+
+                                <!-- C-Rank Gate -->
+                                <div class="gate-item-card glass-panel" data-gate-rank="C">
+                                    <div class="gate-rank-badge rank-c">C</div>
+                                    <div class="gate-info">
+                                        <h4 class="gate-name">Orc Stronghold Anomaly</h4>
+                                        <span class="gate-requirement">Requires: C-Rank Key | Min level: 25</span>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm btn-enter-gate" data-gate-rank="C">ENTER</button>
+                                </div>
+
+                                <!-- B-Rank Gate -->
+                                <div class="gate-item-card glass-panel" data-gate-rank="B">
+                                    <div class="gate-rank-badge rank-b">B</div>
+                                    <div class="gate-info">
+                                        <h4 class="gate-name">Gargoyle Temple Gate</h4>
+                                        <span class="gate-requirement">Requires: B-Rank Key | Min level: 45</span>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm btn-enter-gate" data-gate-rank="B">ENTER</button>
+                                </div>
+
+                                <!-- S-Rank Gate -->
+                                <div class="gate-item-card glass-panel" data-gate-rank="S">
+                                    <div class="gate-rank-badge rank-s">S</div>
+                                    <div class="gate-info">
+                                        <h4 class="gate-name">Jeju Island Hive Outpost</h4>
+                                        <span class="gate-requirement">Requires: S-Rank Key | Min level: 75</span>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm btn-enter-gate" data-gate-rank="S">ENTER</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dungeon Battle HUD -->
+                        <div class="glass-panel pad-lg flex-col-between">
+                            <h3 class="panel-subtitle"><i class="fa-solid fa-gamepad"></i> Active Raid Interface</h3>
+                            
+                            <div id="battle-pre-screen" class="battle-placeholder flex-col-center">
+                                <i class="fa-solid fa-ban placeholder-icon"></i>
+                                <p class="placeholder-text">NO ACTIVE DUNGEON RAID</p>
+                                <span class="placeholder-sub">Purchase or obtain a gate key from daily loot chest rewards to start a raid.</span>
+                            </div>
+
+                            <div id="battle-active-screen" class="battle-screen-layout hidden">
+                                <!-- Battle Stats -->
+                                <div class="battle-fighter-row">
+                                    <div class="fighter-stats">
+                                        <span class="fighter-name">Sung Jinwoo</span>
+                                        <div class="fighter-health-bar">
+                                            <div id="battle-player-hp" class="fill bg-green" style="width: 100%;"></div>
+                                        </div>
+                                        <span id="battle-player-hp-text" class="fighter-vals">100 / 100 HP</span>
+                                    </div>
+                                    <div class="battle-vs">VS</div>
+                                    <div class="fighter-stats text-right">
+                                        <span id="battle-boss-name" class="fighter-name">Goblin Chieftain</span>
+                                        <div class="fighter-health-bar">
+                                            <div id="battle-boss-hp" class="fill bg-red" style="width: 100%;"></div>
+                                        </div>
+                                        <span id="battle-boss-hp-text" class="fighter-vals">300 / 300 HP</span>
+                                    </div>
+                                </div>
+
+                                <!-- Combat Feed Logs -->
+                                <div id="battle-log-feed" class="battle-feed-box mt-md">
+                                    <div class="feed-entry system-msg">Dungeon Gate initialized... Hostile presence detected!</div>
+                                </div>
+
+                                <!-- Active Controls -->
+                                <div class="battle-controls mt-md">
+                                    <button id="btn-battle-attack" class="btn btn-primary"><i class="fa-solid fa-skull"></i> Basic Attack</button>
+                                    <button id="btn-battle-skill" class="btn btn-secondary"><i class="fa-solid fa-bolt-lightning"></i> Shadow Strike (15 MP)</button>
+                                    <button id="btn-battle-heal" class="btn btn-success"><i class="fa-solid fa-flask"></i> Health Potion</button>
+                                    <button id="btn-battle-flee" class="btn btn-warning"><i class="fa-solid fa-person-running"></i> Retreat</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 6: INVENTORY -->
+                <section id="inventory-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-box-open header-glow-icon"></i> SYSTEM INVENTORY & LOOT REWARDS</h2>
+                        <span class="accent-sub">Manage your accumulated weapons, consumables, and open earned reward loot boxes</span>
+                    </div>
+
+                    <div class="grid-2-col">
+                        <!-- Left Panel: Inventory Grid -->
+                        <div class="glass-panel pad-lg">
+                            <h3 class="panel-subtitle"><i class="fa-solid fa-wallet"></i> Golden Reserves & Treasury</h3>
+                            <div class="gold-treasury-banner mt-xs">
+                                <span class="label">GOLD BALANCE</span>
+                                <span id="inventory-gold-val" class="value orbitron-text text-glow-gold">0 G</span>
+                            </div>
+
+                            <h3 class="panel-subtitle mt-lg"><i class="fa-solid fa-bag-shopping"></i> Equipped Weapons & Magical Items</h3>
+                            <div class="inventory-grid mt-sm" id="inventory-grid">
+                                <!-- Filled dynamically via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Loot Box Opener -->
+                        <div class="glass-panel pad-lg flex-col-between">
+                            <div>
+                                <h3 class="panel-subtitle"><i class="fa-solid fa-gift"></i> Unopened Daily Loot Chests</h3>
+                                <p class="section-desc-sm">Completed daily quests reward you with chests. Chest tier depends on your workout difficulty.</p>
+
+                                <div class="loot-boxes-held-list mt-md">
+                                    <div class="chest-row-item">
+                                        <div class="chest-info">
+                                            <i class="fa-solid fa-box chest-icon bronze-chest"></i>
+                                            <span>Bronze Reward Boxes: <strong id="chest-count-bronze" class="text-glow-blue">0</strong></span>
+                                        </div>
+                                        <button class="btn btn-primary btn-sm btn-open-box" data-chest-type="bronze">OPEN</button>
+                                    </div>
+                                    <div class="chest-row-item mt-sm">
+                                        <div class="chest-info">
+                                            <i class="fa-solid fa-box-open chest-icon silver-chest"></i>
+                                            <span>Silver Reward Boxes: <strong id="chest-count-silver" class="text-glow-blue">0</strong></span>
+                                        </div>
+                                        <button class="btn btn-primary btn-sm btn-open-box" data-chest-type="silver">OPEN</button>
+                                    </div>
+                                    <div class="chest-row-item mt-sm">
+                                        <div class="chest-info">
+                                            <i class="fa-solid fa-boxes-packing chest-icon gold-chest"></i>
+                                            <span>Gold Reward Boxes: <strong id="chest-count-gold" class="text-glow-blue">0</strong></span>
+                                        </div>
+                                        <button class="btn btn-primary btn-sm btn-open-box" data-chest-type="gold">OPEN</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="shop-merchant-section mt-lg border-top">
+                                <h3 class="panel-subtitle mt-md"><i class="fa-solid fa-store"></i> System Shop Merchant</h3>
+                                <p class="section-desc-sm">Trade your gold reserves for essential combat inventory consumables.</p>
+                                <div class="shop-grid mt-sm">
+                                    <div class="shop-item">
+                                        <span>Health Potion (50g)</span>
+                                        <button id="btn-buy-hp" class="btn btn-xs btn-primary">BUY</button>
+                                    </div>
+                                    <div class="shop-item">
+                                        <span>Mana Potion (50g)</span>
+                                        <button id="btn-buy-mp" class="btn btn-xs btn-primary">BUY</button>
+                                    </div>
+                                    <div class="shop-item">
+                                        <span>E-Rank Key (100g)</span>
+                                        <button id="btn-buy-key-e" class="btn btn-xs btn-primary">BUY</button>
+                                    </div>
+                                    <div class="shop-item">
+                                        <span>C-Rank Key (500g)</span>
+                                        <button id="btn-buy-key-c" class="btn btn-xs btn-primary">BUY</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 6: INTELLECTUAL TRIALS -->
+                <section id="intellectual-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-brain header-glow-icon"></i> MONARCH'S ACADEMY & INTELLECTUAL TRIALS</h2>
+                        <span class="accent-sub">Acquire intellectual superiority through daily scriptures, comparative studies, history, and epidemiology</span>
+                    </div>
+
+                    <!-- COGNITIVE HUD STATUS CARD -->
+                    <div class="intellectual-hud-banner">
+                        <div class="iq-score-panel">
+                            <span class="iq-title-tag">SYSTEM COGNITIVE SCORE</span>
+                            <div>
+                                <span id="hud-iq-val" class="iq-score-display">80</span>
+                                <span id="hud-iq-rank" class="iq-rank-tag">[E-Rank Core]</span>
+                            </div>
+                        </div>
+                        <div class="iq-gauge-panel">
+                            <div class="iq-gauge-labels">
+                                <span>COGNITIVE BRACKET PROGRESS</span>
+                                <span id="hud-iq-progress-lbl">80 / 90 IQ</span>
+                            </div>
+                            <div class="iq-gauge-bar-outer">
+                                <div id="hud-iq-bar" class="iq-gauge-bar-inner" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                        <div class="intellectual-streak-box">
+                            <span id="intellectual-streak-val" class="streak-val">0 days</span>
+                            <span class="streak-lbl">ACTIVE STUDY STREAK</span>
+                        </div>
+                    </div>
+
+                    <!-- SUB-TABS NAVIGATION -->
+                    <div class="intellectual-sub-nav">
+                        <button class="sub-tab-btn active" data-subtab="study-subtab"><i class="fa-solid fa-book-open"></i> Daily Study Nodes</button>
+                        <button class="sub-tab-btn" data-subtab="flashcards-subtab"><i class="fa-solid fa-clone"></i> Flashcard Codex</button>
+                        <button class="sub-tab-btn" data-subtab="exam-subtab"><i class="fa-solid fa-graduation-cap"></i> Weekly Exam Hall</button>
+                    </div>
+
+                    <!-- SUB-PANEL 1: DAILY STUDY NODES -->
+                    <div id="study-subtab" class="intellectual-sub-content">
+                        <div class="intellectual-grid">
+                            <!-- BIBLE -->
+                            <div class="synaptic-node-card glass-panel node-bible pad-lg" data-subject="bible">
+                                <div class="node-accent-bar"></div>
+                                <div class="node-header">
+                                    <div class="node-icon-wrap"><i class="fa-solid fa-book-bible"></i></div>
+                                    <div class="node-title-group">
+                                        <h4>Holy Scripture</h4>
+                                        <span>Exegesis & Canonical Readings</span>
+                                    </div>
+                                </div>
+                                <p class="text-secondary" style="font-size:11px; line-height:1.4;">Meditate on daily canonical passages from the Bible. Unlock spiritual insight and hermeneutic depths.</p>
+                                <div class="node-status-text pending" id="node-status-bible">
+                                    <i class="fa-solid fa-hourglass-half"></i> PENDING CONQUERING
+                                </div>
+                            </div>
+
+                            <!-- COMPARATIVE RELIGION -->
+                            <div class="synaptic-node-card glass-panel node-religion pad-lg" data-subject="religion">
+                                <div class="node-accent-bar"></div>
+                                <div class="node-header">
+                                    <div class="node-icon-wrap"><i class="fa-solid fa-dharmachakra"></i></div>
+                                    <div class="node-title-group">
+                                        <h4>Comparative Religion</h4>
+                                        <span>Theological Foundations & Divergences</span>
+                                    </div>
+                                </div>
+                                <p class="text-secondary" style="font-size:11px; line-height:1.4;">Analyze and compare truth claims, texts, and practices across major faiths (e.g. Christian-Islamic scholarship).</p>
+                                <div class="node-status-text pending" id="node-status-religion">
+                                    <i class="fa-solid fa-hourglass-half"></i> PENDING CONQUERING
+                                </div>
+                            </div>
+
+                            <!-- WORLD POLITICAL HISTORY -->
+                            <div class="synaptic-node-card glass-panel node-history pad-lg" data-subject="history">
+                                <div class="node-accent-bar"></div>
+                                <div class="node-header">
+                                    <div class="node-icon-wrap"><i class="fa-solid fa-earth-americas"></i></div>
+                                    <div class="node-title-group">
+                                        <h4>World Political History</h4>
+                                        <span>Geopolitics, Empires & Epochs</span>
+                                    </div>
+                                </div>
+                                <p class="text-secondary" style="font-size:11px; line-height:1.4;">Study historical shifts, treaties, empire structures, and the political paradigms that shaped human systems.</p>
+                                <div class="node-status-text pending" id="node-status-history">
+                                    <i class="fa-solid fa-hourglass-half"></i> PENDING CONQUERING
+                                </div>
+                            </div>
+
+                            <!-- PHILOSOPHY & THEOLOGY -->
+                            <div class="synaptic-node-card glass-panel node-philosophy pad-lg" data-subject="philosophy">
+                                <div class="node-accent-bar"></div>
+                                <div class="node-header">
+                                    <div class="node-icon-wrap"><i class="fa-solid fa-monument"></i></div>
+                                    <div class="node-title-group">
+                                        <h4>Philosophy & Theology</h4>
+                                        <span>Hermeneutics, Epistemology & Logic</span>
+                                    </div>
+                                </div>
+                                <p class="text-secondary" style="font-size:11px; line-height:1.4;">Grapple with core philosophical schools, logical syllogisms, and rigorous theological exegesis.</p>
+                                <div class="node-status-text pending" id="node-status-philosophy">
+                                    <i class="fa-solid fa-hourglass-half"></i> PENDING CONQUERING
+                                </div>
+                            </div>
+
+                            <!-- PUBLIC HEALTH & EPIDEMIOLOGY -->
+                            <div class="synaptic-node-card glass-panel node-epidemiology pad-lg" data-subject="epidemiology">
+                                <div class="node-accent-bar"></div>
+                                <div class="node-header">
+                                    <div class="node-icon-wrap"><i class="fa-solid fa-virus-covid"></i></div>
+                                    <div class="node-title-group">
+                                        <h4>Epidemiology & Biostatistics</h4>
+                                        <span>Public Health Models & Statistical Data</span>
+                                    </div>
+                                </div>
+                                <p class="text-secondary" style="font-size:11px; line-height:1.4;">Diagnose disease dynamics, calculate Odds Ratios, interpret p-values, and review biostatistical trial designs.</p>
+                                <div class="node-status-text pending" id="node-status-epidemiology">
+                                    <i class="fa-solid fa-hourglass-half"></i> PENDING CONQUERING
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI GATEWAY CONNECTION BOX -->
+                        <div class="api-gateway-box glass-panel pad-lg mt-lg">
+                            <div class="flex-row-between" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                <h3 class="panel-subtitle" style="border-bottom:none; margin-bottom:0; padding-bottom:0;"><i class="fa-solid fa-network-wired"></i> System AI Intelligence Gateway</h3>
+                                <span id="api-status-badge" class="api-status-badge offline"><i class="fa-solid fa-circle"></i> LOCAL DECRYPTION MODE</span>
+                            </div>
+                            <p class="section-desc-sm">Paste your Google Gemini API Key below. When connected, the System compiles unique study prompts and quizzes live from the neural cloud!</p>
+                            
+                            <form id="form-api-gateway" class="appraisal-form mt-sm" style="display:flex; gap:10px; align-items:center;">
+                                <div class="form-group" style="flex-grow:1; margin-top:0;">
+                                    <input type="password" id="input-api-key" placeholder="Paste Google Gemini API Key here (e.g. AIzaSy...)" value="">
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="padding:10px 20px; white-space:nowrap;"><i class="fa-solid fa-plug"></i> BIND API GATEWAY</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- SUB-PANEL 2: FLASHCARD CODEX -->
+                    <div id="flashcards-subtab" class="intellectual-sub-content hidden">
+                        <div class="flashcard-deck-layout">
+                            <div class="flashcard-perspective">
+                                <div id="active-flashcard" class="flashcard-3d">
+                                    <!-- FRONT SIDE -->
+                                    <div class="flashcard-side front">
+                                        <span class="card-subject-tag" id="flashcard-subject-front">Public Health</span>
+                                        <p class="card-main-content" id="flashcard-text-front">Loading Card Front...</p>
+                                        <span class="card-flip-prompt"><i class="fa-solid fa-rotate"></i> CLICK TO FLIP CARD</span>
+                                    </div>
+                                    <!-- BACK SIDE -->
+                                    <div class="flashcard-side back">
+                                        <span class="card-subject-tag" id="flashcard-subject-back">EXPLANATION</span>
+                                        <p class="card-main-content" id="flashcard-text-back">Loading definition/formula explanation...</p>
+                                        <span class="card-flip-prompt"><i class="fa-solid fa-rotate"></i> CLICK TO SHOW CONCEPT</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ACTIONS -->
+                            <div class="flashcard-actions-bar">
+                                <button id="btn-flashcard-review" class="btn btn-secondary btn-full btn-lg" style="border-color:var(--color-crimson); color:var(--color-crimson); background:rgba(255,45,85,0.05); box-shadow:none;"><i class="fa-solid fa-circle-xmark"></i> NEEDS REVIEW</button>
+                                <button id="btn-flashcard-master" class="btn btn-primary btn-full btn-lg" style="border-color:var(--color-green); color:var(--color-green); background:rgba(0,230,118,0.05); box-shadow:none;"><i class="fa-solid fa-circle-check"></i> MASTERED</button>
+                            </div>
+
+                            <div class="flashcard-counters">
+                                <span>Mastered: <strong id="flashcard-count-mastered" class="text-glow-green">0</strong> / 25</span>
+                                <span id="flashcard-index-indicator">Card 1 of 25</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUB-PANEL 3: WEEKLY EXAM HALL -->
+                    <div id="exam-subtab" class="intellectual-sub-content hidden">
+                        <div class="exam-hall-card glass-panel pad-lg">
+                            <div class="exam-permit-indicator">
+                                <div class="exam-permit-count" id="exam-permit-val">0</div>
+                                <div>
+                                    <span class="exam-permit-lbl">MONARCH EXAM PERMITS</span>
+                                    <p class="text-secondary" style="font-size:11px; margin-top:2px;">Permits are awarded after maintaining a consecutive 3-day workout & study streak.</p>
+                                </div>
+                            </div>
+
+                            <div class="exam-stat-history-grid">
+                                <div class="metric-box">
+                                    <div class="metric-label">EXAMS CONQUERED</div>
+                                    <div id="exam-stat-count" class="metric-value">0</div>
+                                    <div class="metric-sub text-glow-green">Successful decryptions</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="metric-label">AVERAGE EXAM SCORE</div>
+                                    <div id="exam-stat-avg" class="metric-value">0%</div>
+                                    <div class="metric-sub">Across all gates</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="metric-label">HIGHEST SCORE</div>
+                                    <div id="exam-stat-max" class="metric-value">0%</div>
+                                    <div class="metric-sub text-glow-gold">Ultimate peak accuracy</div>
+                                </div>
+                            </div>
+
+                            <div class="exam-gate-trigger-container text-center">
+                                <h4 class="exam-gate-title orbitron-text">WEEKLY ACADEMIC GATEWAY</h4>
+                                <p class="text-secondary mb-sm" style="font-size:12px; max-width:500px; margin: 0 auto 20px auto;">Conquering this 10-question gate grants a permanent **+10 IQ points**, rare inventory loot chests, and boosts maximum MP combat stats. Fleeing or failing resets permits!</p>
+                                <button id="btn-enter-exam" class="btn btn-warning btn-lg disabled" disabled><i class="fa-solid fa-dungeon"></i> ENTER MONARCH EXAM GATE</button>
+                            </div>
+
+                            <h3 class="panel-subtitle mt-lg"><i class="fa-solid fa-clock-rotate-left"></i> Historic Exam Logs</h3>
+                            <div class="exam-history-card glass-panel pad-sm mt-xs">
+                                <div id="exam-history-list">
+                                    <div class="battle-placeholder flex-col-center" style="height: 80px; border:none; background:transparent;">
+                                        <i class="fa-solid fa-hourglass placeholder-icon" style="font-size:18px;"></i>
+                                        <p class="placeholder-text" style="font-size:11px;">NO REGISTERED EXAM CONQUESTS</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL 1: INITIAL AWAKENING APPRAISAL FORM -->
+    <div id="modal-appraisal" class="modal-backdrop hidden">
+        <div class="modal-card glass-panel pad-xl text-center animated-zoom">
+            <div class="system-alert-tag text-glow-blue">THE SYSTEM IS INITIATING APPRAISAL</div>
+            <h1 class="modal-title orbitron-text mt-sm">PLAYER AWAKENING CEREMONY</h1>
+            <p class="modal-desc mt-xs text-secondary">Inputs will be analyzed to assess your physical baseline and allocate your starting rank.</p>
+
+            <form id="form-appraisal" class="appraisal-form mt-lg">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="appraisal-name">Player Hunter Name</label>
+                        <input type="text" id="appraisal-name" required placeholder="e.g. Sung Jinwoo" value="Sung Jinwoo">
+                    </div>
+                    <div class="form-group">
+                        <label for="appraisal-gender">Gender</label>
+                        <select id="appraisal-gender" class="system-select">
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row mt-sm">
+                    <div class="form-group">
+                        <label for="appraisal-age">Age</label>
+                        <input type="number" id="appraisal-age" required min="1" max="120" placeholder="e.g. 24" value="24">
+                    </div>
+                    <div class="form-group">
+                        <label for="appraisal-height">Height (cm)</label>
+                        <input type="number" id="appraisal-height" required min="50" max="250" placeholder="e.g. 175" value="175">
+                    </div>
+                    <div class="form-group">
+                        <label for="appraisal-weight">Current Weight (kg)</label>
+                        <input type="number" id="appraisal-weight" required min="10" max="300" placeholder="e.g. 68" value="68">
+                    </div>
+                </div>
+
+                <div class="form-row mt-sm">
+                    <div class="form-group">
+                        <label for="appraisal-class">Awakened Gym Combat Class</label>
+                        <select id="appraisal-class" class="system-select">
+                            <option value="knight" selected>Heavy Knight (+5 STR, +2 VIT base stats) - Strength focused</option>
+                            <option value="assassin">Shadow Assassin (+5 AGI, +2 SEN base stats) - Speed & Stamina focused</option>
+                            <option value="mage">Mystic Mage (+5 INT, +2 VIT base stats) - Spell & Sleep focused</option>
+                            <option value="ranger">Vanguard Ranger (+5 SEN, +2 AGI base stats) - Cardio & Reflex focused</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row mt-sm">
+                    <div class="form-group">
+                        <label for="appraisal-activity">Daily Physical Activity Level</label>
+                        <select id="appraisal-activity" class="system-select">
+                            <option value="sedentary">Sedentary (Little to no daily physical exertion)</option>
+                            <option value="light">Lightly Active (Light exercises 1-3 times a week)</option>
+                            <option value="moderate" selected>Moderately Active (Moderate exercises 3-5 times a week)</option>
+                            <option value="heavy">Heavily Active (Aggressive daily training / sports)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row mt-sm">
+                    <div class="form-group">
+                        <label for="appraisal-goal">Desired Hunter Path (Target Goal)</label>
+                        <select id="appraisal-goal" class="system-select">
+                            <option value="bulk">Muscle Gain / Heavy Knight Armor (Monarch's Bulk Plan)</option>
+                            <option value="stealth">Fat Loss / Assassin Speed & Agility (Shadow Stealth Plan)</option>
+                            <option value="balance">Optimal Health / Balanced Archmage (Hunter's Balance Plan)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-full mt-xl">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> START AWAKENING EVALUATION
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: GACHA REWARD LOOT BOX OPENER -->
+    <div id="modal-gacha" class="modal-backdrop hidden">
+        <div class="modal-card gacha-card glass-panel pad-xl text-center">
+            <div class="particle-explosion-container" id="gacha-particles"></div>
+            
+            <div id="gacha-animation-state">
+                <h2 class="orbitron-text text-glow-blue" id="gacha-chest-title">BRONZE LOOT BOX</h2>
+                <div class="chest-visual-holder mt-lg">
+                    <i id="gacha-chest-icon" class="fa-solid fa-box chest-opening-animation bronze-chest"></i>
+                </div>
+                <p class="mt-lg text-secondary">The system is decoding rewards... click to trigger extraction!</p>
+                <button id="btn-gacha-trigger" class="btn btn-success btn-lg mt-md">EXTRACT REWARDS</button>
+            </div>
+
+            <div id="gacha-reward-state" class="hidden">
+                <div class="reward-sparkle"></div>
+                <span class="system-alert-tag text-glow-gold">EXTRACTION REWARD CONFIRMED</span>
+                
+                <div class="reward-card mt-lg" id="reward-item-card">
+                    <div class="reward-card-glow"></div>
+                    <i class="fa-solid fa-sword reward-item-icon" id="reward-item-icon"></i>
+                    <h3 class="reward-item-name" id="reward-item-name">Kasaka's Venom Fang</h3>
+                    <div class="reward-item-rarity" id="reward-item-rarity">C-Rank Weapon</div>
+                    <p class="reward-item-desc" id="reward-item-desc">A shortsword made from the fang of a Kasaka viper. Deals moderate damage and poisons target.</p>
+                </div>
+
+                <button id="btn-gacha-close" class="btn btn-primary btn-lg mt-xl">CONFIRM & SAVE TO INVENTORY</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: ADD CUSTOM GYM EXERCISE -->
+    <div id="modal-add-exercise" class="modal-backdrop hidden">
+        <div class="modal-card glass-panel pad-lg animated-zoom" style="max-width: 500px;">
+            <h3 class="panel-subtitle"><i class="fa-solid fa-dumbbell"></i> Register Gym Exercise Variant</h3>
+            <form id="form-add-exercise" class="appraisal-form mt-sm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="exercise-category">Muscle Target Group</label>
+                        <select id="exercise-category" class="system-select">
+                            <option value="chest">Chest (Pectorals)</option>
+                            <option value="back">Back (Latissimus / Traps)</option>
+                            <option value="legs">Legs (Quads / Hamstrings)</option>
+                            <option value="shoulders">Shoulders (Deltoids)</option>
+                            <option value="arms">Arms (Biceps / Triceps)</option>
+                            <option value="cardio">Cardio & Physical Endurance</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="exercise-variant">Exercise Variant</label>
+                        <select id="exercise-variant" class="system-select">
+                            <!-- Populated dynamically in app.js -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row mt-sm">
+                    <div class="form-group">
+                        <label for="exercise-sets">Target Sets</label>
+                        <input type="number" id="exercise-sets" required min="1" max="10" value="3">
+                    </div>
+                    <div class="form-group">
+                        <label for="exercise-reps">Target Reps / Duration (min)</label>
+                        <input type="number" id="exercise-reps" required min="1" max="100" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="exercise-weight">Target Weight (kg)</label>
+                        <input type="number" id="exercise-weight" required min="0" max="500" value="40">
+                    </div>
+                </div>
+
+                <div class="flex-row-between mt-lg" style="display:flex; justify-content:space-between; gap: 10px;">
+                    <button type="submit" class="btn btn-primary" style="flex-grow:1;"><i class="fa-solid fa-plus"></i> Inject to checklist</button>
+                    <button type="button" id="btn-close-exercise-modal" class="btn btn-secondary" style="flex-grow:1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 4: RITUAL RESTORATION (Trial Deficit Purge) -->
+    <div id="modal-restoration" class="modal-backdrop hidden">
+        <div class="modal-card glass-panel pad-xl text-center animated-zoom" style="max-width: 520px;">
+            <span class="system-alert-tag text-glow-purple">RESTORATION PROTOCOL</span>
+            <h2 class="orbitron-text text-glow-blue mt-sm">RITUAL OF THE CLEANSING MONARCH</h2>
+            <p class="modal-desc mt-xs text-secondary">Complete these tasks to purge the 'Faltered Resolve' decay state from your system.</p>
+            
+            <div class="holistic-checkboxes mt-lg text-left" style="max-width: 440px; margin: 20px auto;">
+                <label class="holistic-check-item">
+                    <input type="checkbox" id="ritual-meditation" disabled>
+                    <span class="custom-checkbox"></span>
+                    <span class="check-text">Concentrate Mana: Meditate 5 Mins (<span id="ritual-meditation-timer">05:00</span>)</span>
+                </label>
+                
+                <label class="holistic-check-item mt-sm">
+                    <input type="checkbox" id="ritual-hydration" disabled>
+                    <span class="custom-checkbox"></span>
+                    <span class="check-text">Nourish Core: Log 3,000 ml water (<span id="ritual-water-progress">0/3000</span> ml)</span>
+                </label>
+                
+                <label class="holistic-check-item mt-sm">
+                    <input type="checkbox" id="ritual-sleep">
+                    <span class="custom-checkbox"></span>
+                    <span class="check-text">Stasis Rest: Logged 8+ hours of stasis sleep recovery</span>
+                </label>
+            </div>
+            
+            <div class="flex-col-center mt-lg" style="gap:10px; width:100%;">
+                <button id="btn-ritual-meditate" class="btn btn-primary btn-full"><i class="fa-solid fa-yin-yang"></i> Start Ritual Meditation</button>
+                <button id="btn-complete-ritual" class="btn btn-success btn-full disabled" disabled><i class="fa-solid fa-circle-check"></i> PURGE DEBUFF</button>
+                <button id="btn-close-ritual-modal" class="btn btn-secondary btn-full">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: INTELLECTUAL STUDY NODE -->
+    <div id="modal-study-node" class="modal-backdrop hidden">
+        <div class="modal-card glass-panel pad-lg animated-zoom" style="max-width: 650px;">
+            <div class="flex-row-between" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(157,78,221,0.2); padding-bottom:12px; margin-bottom:16px;">
+                <h3 id="study-node-subject-title" class="panel-subtitle" style="margin-bottom:0; border-bottom:none; padding-bottom:0; color:var(--color-purple);"><i class="fa-solid fa-brain"></i> Daily Study Node</h3>
+                <span id="study-node-rank" class="api-status-badge online" style="font-family:var(--font-system); text-transform:uppercase;">E-Rank</span>
+            </div>
+            
+            <div id="study-node-passage" class="study-passage-content">
+                <!-- Reading text populated dynamically -->
+            </div>
+            
+            <div id="study-node-discussion" class="study-discussion-box">
+                <!-- Discussion / Reflection question -->
+            </div>
+            
+            <div class="quiz-question-box">
+                <span class="quiz-question-lbl">COMPREHENSION CRITICAL TEST</span>
+                <p id="study-node-question" class="quiz-question-text">Loading synaptic challenge...</p>
+                
+                <div id="study-node-options" class="quiz-options-list">
+                    <!-- Dynamic choice buttons -->
+                </div>
+                
+                <div id="study-node-explanation" class="quiz-explanation-box hidden">
+                    <!-- Answer result and explanation text -->
+                </div>
+            </div>
+            
+            <div class="flex-row-between mt-lg" style="display:flex; justify-content:space-between; gap:10px; border-top:1px solid rgba(255,255,255,0.05); padding-top:16px;">
+                <button id="btn-submit-study-answer" class="btn btn-primary" style="flex-grow:1;"><i class="fa-solid fa-microchip"></i> COMPUTE ANSWER</button>
+                <button id="btn-close-study-modal" class="btn btn-secondary" style="flex-grow:1;">Retract Signatures</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 6: WEEKLY MONARCH EXAM HALL -->
+    <div id="screen-exam" class="penalty-fullscreen-overlay hidden" style="background:radial-gradient(ellipse at center, rgba(122,26,255,0.1) 0%, #06080b 100%);">
+        <div class="penalty-background" style="background:radial-gradient(ellipse at center, rgba(157,78,221,0.15) 0%, transparent 80%);"></div>
+        <div class="penalty-hud" style="border-bottom:1px solid rgba(157,78,221,0.2); padding-bottom:15px; width:100%; max-width:900px; display:flex; justify-content:space-between; align-items:center; z-index:10; flex-direction:row;">
+            <div class="penalty-alert-banner" style="border:none; background:transparent; padding:0; flex-direction:row;">
+                <div class="alert-icon" style="color:var(--color-gold); text-shadow:var(--shadow-gold);"><i class="fa-solid fa-crown"></i></div>
+                <div class="alert-texts" style="margin-left:12px;">
+                    <h1 class="orbitron-text" style="color:var(--color-gold); text-shadow:var(--shadow-gold); margin:0;">THE MONARCH EXAMINATION</h1>
+                    <p style="color:var(--color-text-muted); margin:0;">Decryption accuracy must be above 70% to pass.</p>
+                </div>
+            </div>
+            <div class="penalty-timer-card glass-panel" style="border-color:rgba(157,78,221,0.3); box-shadow:var(--shadow-purple); width:unset; margin:0;">
+                <span class="label">TIME REMAINING</span>
+                <span id="exam-timer-val" class="value orbitron-text" style="color:var(--color-cyan); text-shadow:var(--shadow-cyan);">10:00</span>
+            </div>
+        </div>
+        
+        <div class="modal-card glass-panel pad-xl animated-zoom mt-xl" style="max-width: 800px; z-index:10; border-color:var(--color-purple); box-shadow:var(--shadow-purple); margin-top:20px;">
+            <div class="flex-row-between" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(157,78,221,0.2); padding-bottom:12px; margin-bottom:16px;">
+                <span class="api-status-badge online" style="background:rgba(255,215,0,0.1); border-color:var(--color-gold); color:var(--color-gold);"><i class="fa-solid fa-brain"></i> QUESTION <span id="exam-question-index">1</span> / 10</span>
+                <span id="exam-subject-badge" class="api-status-badge offline" style="background:rgba(122,26,255,0.1); border-color:var(--color-purple); color:var(--color-purple);">Epidemiology</span>
+            </div>
+            
+            <p id="exam-question-text" class="quiz-question-text" style="font-size:18px; line-height:1.5;">Loading exam diagnostic question...</p>
+            
+            <div id="exam-options-list" class="quiz-options-list mt-md">
+                <!-- Dynamically populated choices -->
+            </div>
+            
+            <div class="flex-row-between mt-xl" style="display:flex; justify-content:space-between; gap:10px; border-top:1px solid rgba(255,255,255,0.05); padding-top:16px;">
+                <button id="btn-exam-next" class="btn btn-primary" style="flex-grow:1;"><i class="fa-solid fa-forward"></i> SUBMIT & ADVANCE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 5: PENALTY QUEST SURVIVAL GAME -->
+    <div id="screen-penalty" class="penalty-fullscreen-overlay hidden">
+        <div class="penalty-background"></div>
+        <div class="penalty-hud">
+            <div class="penalty-alert-banner">
+                <div class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div class="alert-texts">
+                    <h1 class="orbitron-text">PENALTY QUEST INITIATED</h1>
+                    <p>WARNING: Daily Quest incomplete. Surviving the penalty zone is mandatory.</p>
+                </div>
+            </div>
+            <div class="penalty-timer-card glass-panel">
+                <span class="label">SURVIVAL TIME LEFT</span>
+                <span id="penalty-timer-val" class="value orbitron-text">01:00</span>
+            </div>
+        </div>
+
+        <div class="penalty-canvas-container">
+            <canvas id="penalty-canvas" width="800" height="400"></canvas>
+            <div class="mobile-controls-tip">
+                <p><i class="fa-solid fa-arrows-to-eye"></i> Move your mouse/touch, or use <strong>WASD / Arrow Keys</strong> to steer your player core (blue glow) away from giant desert centipedes (red bars)!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIO/VISUAL NOTIFICATION OVERLAY -->
+    <div id="system-toast-container" class="toast-container"></div>
+
+    <!-- Custom JS Script -->
+    <script src="app.js?v=2.3"></script>
+</body>
+</html>
