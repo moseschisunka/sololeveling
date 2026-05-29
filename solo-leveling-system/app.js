@@ -214,10 +214,13 @@ document.addEventListener("DOMContentLoaded", () => {
 // --- AUTHENTICATION & SECURITY GATE ---
 function checkAuthentication() {
     const data = localStorage.getItem("solo_leveling_player_state");
+    let authenticated = false;
+
     if (data) {
         try {
             const parsed = JSON.parse(data);
             if (parsed.authenticated) {
+                authenticated = true;
                 // Merge parsed state with default properties to support upgrade pathways without errors
                 playerState = {
                     ...playerState,
@@ -249,6 +252,12 @@ function checkAuthentication() {
         } catch (e) {
             console.error("Error reading login state", e);
         }
+    }
+
+    if (!authenticated) {
+        document.getElementById("screen-login").classList.remove("hidden");
+        document.getElementById("screen-login").style.display = "flex";
+        document.getElementById("app-container").classList.add("hidden");
     }
 }
 
