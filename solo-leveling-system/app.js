@@ -2996,6 +2996,19 @@ function finishExam(passed, score = 0) {
 }
 
 // --- 10. SYSTEM AI ENDPOINT API GATEWAY (GEMINI CORES) ---
+function cleanJsonText(text) {
+    let cleaned = text.trim();
+    if (cleaned.startsWith("```json")) {
+        cleaned = cleaned.substring(7);
+    } else if (cleaned.startsWith("```")) {
+        cleaned = cleaned.substring(3);
+    }
+    if (cleaned.endsWith("```")) {
+        cleaned = cleaned.substring(0, cleaned.length - 3);
+    }
+    return cleaned.trim();
+}
+
 function saveApiKey(key) {
     if (!key || key.length < 10) {
         playerState.apiKey = "";
@@ -3023,20 +3036,20 @@ async function fetchGeminiStudyPassage(subject) {
     else if (subject === "epidemiology") subjectFocus = "public health, biostatistics equations, and clinical epidemiologic study designs";
 
     const prompt = `You are "THE SYSTEM" from Solo Leveling, an elite AI tutor interface designed to test the player's mind.
-Generate a daily academic study lesson in ${subjectFocus} formatted exactly as a raw JSON block.
-Scale the reading difficulty and vocabulary appropriate for a Level ${lvl} Hunter (${title}).
+    Generate a daily academic study lesson in ${subjectFocus} formatted exactly as a raw JSON block.
+    Scale the reading difficulty and vocabulary appropriate for a Level ${lvl} Hunter (${title}).
 
-The JSON response MUST fit this exact schema without markdown wraps:
-{
-  "passage": "A detailed 2-paragraph analysis with HTML <p> and <strong> tags highlighting critical terms.",
-  "discussion": "A single thought-provoking contemplation prompt.",
-  "quizQuestion": "A multiple-choice question testing the passage details.",
-  "options": ["Option A", "Option B", "Option C", "Option D"],
-  "correctIndex": 0,
-  "explanation": "A concise paragraph explaining why the correct option is correct."
-}
+    The JSON response MUST fit this exact schema without markdown wraps:
+    {
+      "passage": "A detailed 2-paragraph analysis with HTML <p> and <strong> tags highlighting critical terms.",
+      "discussion": "A single thought-provoking contemplation prompt.",
+      "quizQuestion": "A multiple-choice question testing the passage details.",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctIndex": 0,
+      "explanation": "A concise paragraph explaining why the correct option is correct."
+    }
 
-Do not return any conversational text, just the raw JSON.`;
+    Do not return any conversational text, just the raw JSON.`;
 
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     const payload = {
@@ -3053,7 +3066,7 @@ Do not return any conversational text, just the raw JSON.`;
     if (!response.ok) throw new Error("Gemini API returned status " + response.status);
     const data = await response.json();
     const rawJson = data.candidates[0].content.parts[0].text;
-    return JSON.parse(rawJson);
+    return JSON.parse(cleanJsonText(rawJson));
 }
 
 async function fetchGeminiExamQuestions() {
@@ -3061,21 +3074,21 @@ async function fetchGeminiExamQuestions() {
     const lvl = playerState.level;
 
     const prompt = `You are "THE SYSTEM" from Solo Leveling. Compile a comprehensive 10-question multiple-choice exam testing the player across five fields: Bible studies, Comparative Religion, World History, Philosophy, and Public Health Epidemiology/Biostatistics.
-Format the response exactly as a raw JSON array. Scale it for a Level ${lvl} Hunter.
+    Format the response exactly as a raw JSON array. Scale it for a Level ${lvl} Hunter.
 
-The JSON response MUST fit this exact schema without markdown wraps:
-[
-  {
-    "subject": "Holy Scripture",
-    "question": "Rigorous multiple-choice question text...",
-    "options": ["A", "B", "C", "D"],
-    "correctIndex": 0,
-    "explanation": "Why correct..."
-  },
-  ...
-]
+    The JSON response MUST fit this exact schema without markdown wraps:
+    [
+      {
+        "subject": "Holy Scripture",
+        "question": "Rigorous multiple-choice question text...",
+        "options": ["A", "B", "C", "D"],
+        "correctIndex": 0,
+        "explanation": "Why correct..."
+      },
+      ...
+    ]
 
-Generate exactly 10 questions (2 per subject). Do not return any conversational text, just the raw JSON array.`;
+    Generate exactly 10 questions (2 per subject). Do not return any conversational text, just the raw JSON array.`;
 
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     const payload = {
@@ -3092,7 +3105,7 @@ Generate exactly 10 questions (2 per subject). Do not return any conversational 
     if (!response.ok) throw new Error("Gemini API returned status " + response.status);
     const data = await response.json();
     const rawJson = data.candidates[0].content.parts[0].text;
-    return JSON.parse(rawJson);
+    return JSON.parse(cleanJsonText(rawJson));
 }
 
 // ==========================================================================
