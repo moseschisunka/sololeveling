@@ -1,0 +1,10 @@
+{
+  "name": "solo-leveling-system",
+  "version": "3.0.0",
+  "description": "Static Solo Leveling Gym & Intellectual Accountability HUD Portal",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx -y serve -s ."
+  },
+  "dependencies": {}
+}
