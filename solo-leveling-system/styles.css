@@ -2870,239 +2870,663 @@ body.system-theme {
    MOBILE AESTHETIC PROTOCOLS & RESPONSIVE GRID OVERRIDES
    ========================================================================== */
 @media (max-width: 768px) {
-    /* Layout structural adaptations */
-    .app-container {
-        margin-top: 60px;
-        padding: 12px;
-        min-height: calc(100vh - 60px);
+
+    /* --- GLOBAL MOBILE FOUNDATION --- */
+    html {
+        -webkit-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: transparent;
     }
-    
+
+    body.system-theme {
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .app-container {
+        margin-top: 56px;
+        padding: 10px 10px 80px 10px; /* bottom padding for sticky nav */
+        min-height: calc(100vh - 56px);
+    }
+
+    /* --- HEADER: COMPACT MOBILE BAR --- */
+    .system-header {
+        height: 56px;
+        padding: 0 12px;
+    }
+
+    .system-tag {
+        font-size: 13px;
+        letter-spacing: 2px;
+    }
+
+    .hud-tag {
+        font-size: 7px;
+        letter-spacing: 1px;
+    }
+
+    .header-dev-actions {
+        display: none !important;
+    }
+
+    .header-clock {
+        font-size: 10px;
+        padding: 4px 8px;
+        gap: 4px;
+    }
+
+    #btn-logout {
+        padding: 4px 6px !important;
+        font-size: 10px !important;
+        margin-left: 6px !important;
+    }
+
+    /* --- LAYOUT: SINGLE COLUMN STACK --- */
     .hud-layout {
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 12px;
     }
-    
+
     .hud-left-panel {
         position: relative;
         top: 0;
         width: 100%;
-        gap: 12px;
+        gap: 10px;
     }
-    
-    /* Compact Profile Card Protocol */
+
+    /* --- PROFILE CARD: COMPACT INLINE --- */
     .player-profile-card {
-        padding: 16px;
+        padding: 14px;
         display: grid;
-        grid-template-columns: 64px 1fr;
-        gap: 12px 16px;
+        grid-template-columns: 56px 1fr;
+        gap: 8px 14px;
         align-items: center;
     }
-    
-    .profile-glow {
-        width: 80px;
-        height: 80px;
-        top: 10px;
-    }
-    
+
+    .profile-glow { width: 60px; height: 60px; top: 8px; }
+
     .avatar-container {
-        width: 64px;
-        height: 64px;
+        width: 56px;
+        height: 56px;
         margin-bottom: 0;
         grid-row: span 2;
     }
-    
-    .avatar-icon {
-        font-size: 28px;
-    }
-    
-    .avatar-glow {
-        border-width: 1px;
-    }
-    
+
+    .avatar-icon { font-size: 24px; }
+    .avatar-glow { border-width: 1px; }
+
     .rank-badge {
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-        top: 8px;
-        right: 8px;
+        width: 28px; height: 28px;
+        font-size: 12px;
+        top: 6px; right: 6px;
     }
-    
+
     .player-info {
         text-align: left;
         margin-bottom: 0;
         align-self: end;
     }
-    
-    .player-name {
-        font-size: 16px;
-    }
-    
-    .player-title {
-        font-size: 9px;
-        margin-top: 2px;
-    }
-    
-    /* Progress Bars & Level summary */
+
+    .player-name { font-size: 15px; }
+    .player-title { font-size: 8px; margin-top: 1px; letter-spacing: 1px; }
+
     .player-profile-card > .stat-progress-group,
     .player-profile-card > .gold-level-summary {
         grid-column: span 2;
         margin-bottom: 0;
     }
-    
-    .player-profile-card > .stat-progress-group {
-        margin-top: -4px;
-    }
-    
+
+    .player-profile-card > .stat-progress-group { margin-top: -2px; }
+
     .gold-level-summary {
-        margin-top: 4px;
-        padding-top: 10px;
+        margin-top: 2px;
+        padding-top: 8px;
         border-top: 1px solid rgba(255, 255, 255, 0.05);
     }
-    
-    /* Horizontal Scrolling Navigation Tab bar */
+
+    /* --- TRIAL DEFICIT BANNER --- */
+    .trial-deficit-card {
+        padding: 12px !important;
+    }
+
+    .trial-deficit-card .warning-desc {
+        font-size: 11px;
+    }
+
+    /* --- BOTTOM STICKY NAVIGATION BAR --- */
     .hud-tabs {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 200 !important;
         flex-direction: row !important;
         overflow-x: auto !important;
         white-space: nowrap !important;
-        gap: 8px !important;
-        padding: 4px 0 10px 0 !important;
-        border-bottom: 1px solid rgba(0, 243, 255, 0.1);
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none; /* IE 10+ */
+        gap: 0 !important;
+        padding: 0 !important;
+        padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+        background: rgba(6, 8, 11, 0.96) !important;
+        border-top: 1px solid rgba(0, 243, 255, 0.15) !important;
+        border-bottom: none !important;
+        border-radius: 0 !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
-    
-    .hud-tabs::-webkit-scrollbar {
-        display: none; /* WebKit */
-    }
-    
+
+    .hud-tabs::-webkit-scrollbar { display: none; }
+
     .tab-btn {
         width: auto !important;
         display: inline-flex !important;
+        flex-direction: column !important;
         align-items: center !important;
+        justify-content: center !important;
         white-space: nowrap !important;
-        padding: 10px 14px !important;
-        font-size: 11px !important;
+        padding: 8px 12px 6px 12px !important;
+        font-size: 8px !important;
         flex-shrink: 0 !important;
-        gap: 8px !important;
+        gap: 3px !important;
+        min-height: 52px !important;
+        min-width: 64px !important;
+        border-radius: 0 !important;
+        border: none !important;
+        border-top: 2px solid transparent !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        letter-spacing: 0.5px !important;
     }
-    
-    /* System Header adaptations */
-    .system-header {
-        padding: 0 12px;
+
+    .tab-btn i {
+        font-size: 18px !important;
+        margin-right: 0 !important;
     }
-    
-    .system-tag {
-        font-size: 14px;
-        letter-spacing: 2px;
+
+    .tab-btn.active {
+        border-top-color: var(--color-cyan) !important;
+        background: rgba(0, 243, 255, 0.06) !important;
+        color: var(--color-cyan) !important;
     }
-    
-    .hud-tag {
-        font-size: 8px;
-        letter-spacing: 1px;
-    }
-    
-    .header-dev-actions {
-        display: none !important; /* Hide dev triggers on mobile for clean HUD */
-    }
-    
-    .header-clock {
-        font-size: 11px;
-        padding: 4px 8px;
-        gap: 6px;
-    }
-    
-    /* Global Padding Reduction */
-    .pad-xl { padding: 16px !important; }
+
+    /* --- GLOBAL PADDING REDUCTION --- */
+    .pad-xl { padding: 14px !important; }
     .pad-lg { padding: 12px !important; }
     .pad-md { padding: 10px !important; }
-    
+
+    .mt-xl { margin-top: 24px; }
+    .mt-lg { margin-top: 16px; }
+
+    /* --- SECTION HEADERS --- */
+    .section-header h2 {
+        font-size: 14px;
+        letter-spacing: 1px;
+    }
+
+    .accent-sub {
+        font-size: 11px;
+    }
+
+    /* --- ALL GRID COLLAPSES --- */
+    .grid-2-col {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .appraisal-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    .macros-flex {
+        grid-template-columns: 1fr 1fr 1fr !important;
+        gap: 6px !important;
+    }
+
+    .input-grid {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+    }
+
+    .shop-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    /* --- TOUCH-FRIENDLY BUTTONS (Min 44px tap targets) --- */
+    .btn {
+        min-height: 44px;
+        padding: 10px 16px;
+        font-size: 12px;
+    }
+
+    .btn-lg {
+        padding: 14px 20px !important;
+        font-size: 14px !important;
+    }
+
+    .btn-sm { min-height: 38px; padding: 8px 12px; }
+    .btn-xs { min-height: 34px; padding: 6px 10px; font-size: 10px; }
+
+    .btn-square {
+        width: 44px !important;
+        height: 44px !important;
+    }
+
+    /* --- TOUCH-FRIENDLY INPUTS --- */
+    .system-select, input[type="text"], input[type="number"], input[type="password"] {
+        padding: 12px 14px !important;
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
+    }
+
+    /* --- MODALS: FULL-WIDTH MOBILE --- */
+    .modal-backdrop {
+        padding: 12px !important;
+        align-items: flex-start !important;
+        padding-top: 60px !important;
+    }
+
     .modal-card {
         padding: 16px !important;
         max-width: 100% !important;
+        border-radius: 10px !important;
     }
-    
-    /* Intellectual Banner Adaptation */
-    .intellectual-hud-banner {
+
+    .modal-title {
+        font-size: 18px !important;
+        letter-spacing: 1px !important;
+    }
+
+    .modal-desc {
+        font-size: 11px !important;
+    }
+
+    /* --- LOGIN SCREEN: FULL MOBILE --- */
+    #screen-login .modal-card {
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+
+    #screen-login .system-alert-tag {
+        font-size: 10px;
+    }
+
+    #screen-login .modal-title {
+        font-size: 20px !important;
+    }
+
+    /* --- TAB CONTENT: MAIN PANEL --- */
+    .hud-main-panel {
+        min-height: auto;
+    }
+
+    .panel-subtitle {
+        font-size: 13px;
+    }
+
+    .panel-subtitle i {
+        font-size: 12px;
+    }
+
+    /* --- NOURISHMENT TAB --- */
+    .calorie-budget-ring {
+        width: 130px;
+        height: 130px;
+    }
+
+    .cal-value { font-size: 20px; }
+    .cal-limit { font-size: 12px; }
+
+    .hydration-section {
         flex-direction: column;
-        gap: 16px;
-        align-items: stretch;
-        padding: 16px;
+        gap: 14px;
+        padding: 12px;
     }
-    
-    .iq-gauge-panel {
-        margin: 0;
+
+    .water-progress-visual {
         width: 100%;
     }
-    
+
+    .hydration-buttons {
+        flex-direction: row;
+        width: 100%;
+    }
+
+    .hydration-buttons .btn {
+        flex: 1;
+    }
+
+    /* --- DUNGEON GATES TAB --- */
+    .gate-item-card {
+        padding: 12px 14px;
+        gap: 10px;
+    }
+
+    .gate-rank-badge {
+        width: 32px; height: 32px;
+        font-size: 14px;
+    }
+
+    .gate-name { font-size: 12px; }
+    .gate-requirement { font-size: 9px; }
+
+    .battle-fighter-row {
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .battle-vs {
+        font-size: 14px;
+    }
+
+    .battle-feed-box {
+        height: 140px;
+        font-size: 10px;
+        padding: 10px 12px;
+    }
+
+    .battle-controls {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+    }
+
+    /* --- STAT ALLOCATION TAB --- */
+    .available-points-banner {
+        padding: 12px 16px;
+    }
+
+    .available-points-banner .label { font-size: 11px; }
+    .available-points-banner .value { font-size: 18px; }
+
+    .allocator-item {
+        padding: 10px 14px;
+    }
+
+    .stat-name { font-size: 11px; }
+    .stat-val { font-size: 16px; }
+
+    /* --- INVENTORY TAB --- */
+    .inventory-grid {
+        grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)) !important;
+        gap: 8px !important;
+    }
+
+    .inventory-slot i { font-size: 20px; }
+
+    .chest-row-item {
+        padding: 10px 14px;
+    }
+
+    .chest-info { font-size: 12px; gap: 8px; }
+    .chest-icon { font-size: 16px; }
+
+    /* --- INTELLECTUAL TRIALS TAB --- */
+    .intellectual-hud-banner {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+        padding: 14px;
+    }
+
+    .iq-score-display { font-size: 30px; }
+    .iq-rank-tag { font-size: 10px; margin-left: 6px; }
+
+    .iq-gauge-panel {
+        margin: 0;
+        max-width: 100%;
+        width: 100%;
+    }
+
     .intellectual-streak-box {
         border-left: none;
         border-top: 1px solid rgba(157, 78, 221, 0.15);
         padding-left: 0;
-        padding-top: 12px;
+        padding-top: 10px;
         width: 100%;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
     }
-    
-    .streak-val {
-        font-size: 20px;
+
+    .streak-val { font-size: 18px; }
+
+    /* Intellectual Sub-Navigation */
+    .intellectual-sub-nav {
+        gap: 6px;
+        padding-bottom: 10px;
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
-    
-    /* Flashcard Dimensions and Flip Scaling */
+
+    .intellectual-sub-nav::-webkit-scrollbar { display: none; }
+
+    .sub-tab-btn {
+        padding: 8px 12px;
+        font-size: 10px;
+        flex-shrink: 0;
+    }
+
+    /* Study Cards Grid */
+    .intellectual-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .node-header { gap: 10px; margin-bottom: 8px; }
+    .node-icon-wrap { width: 32px; height: 32px; font-size: 14px; }
+    .node-title-group h4 { font-size: 12px; }
+
+    /* Study Modal Content */
+    .study-passage-content {
+        max-height: 200px;
+        font-size: 12px;
+        padding: 14px;
+        line-height: 1.5;
+    }
+
+    .study-discussion-box {
+        font-size: 10px;
+        padding: 8px 12px;
+    }
+
+    .quiz-question-text {
+        font-size: 13px !important;
+    }
+
+    .quiz-option-btn {
+        padding: 12px 14px !important;
+        font-size: 12px !important;
+        min-height: 44px !important;
+    }
+
+    /* Flashcards */
+    .flashcard-deck-layout {
+        max-width: 100%;
+    }
+
     .flashcard-perspective {
-        height: 280px;
-        margin-bottom: 16px;
+        height: 260px;
+        margin-bottom: 14px;
     }
-    
+
     .flashcard-side {
-        padding: 20px;
+        padding: 18px;
+        border-radius: 10px;
     }
-    
-    .card-main-content {
-        font-size: 18px;
-    }
-    
+
+    .card-subject-tag { font-size: 9px; }
+    .card-main-content { font-size: 16px; }
+
     .flashcard-side.back .card-main-content {
         font-size: 12px;
         line-height: 1.5;
     }
-    
-    /* Exam screen and grids */
-    .exam-stat-history-grid {
-        grid-template-columns: 1fr;
+
+    .card-flip-prompt { font-size: 8px; }
+
+    .flashcard-actions-bar {
         gap: 10px;
     }
-    
+
+    .flashcard-actions-bar .btn {
+        flex: 1;
+        font-size: 10px !important;
+    }
+
+    .flashcard-counters { font-size: 10px; }
+
+    /* Exam Hall */
+    .exam-hall-card {
+        max-width: 100% !important;
+    }
+
+    .exam-permit-indicator {
+        gap: 10px;
+        padding: 12px 14px;
+    }
+
+    .exam-permit-count { font-size: 22px; }
+    .exam-permit-lbl { font-size: 11px; }
+
+    .exam-gate-trigger-container {
+        padding: 24px 16px !important;
+    }
+
+    .exam-gate-title { font-size: 18px; }
+
+    .exam-stat-history-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    .exam-log-item { font-size: 10px; padding: 6px 0; }
+
+    /* API Gateway Box */
+    .api-gateway-box {
+        margin-top: 20px;
+        padding-top: 16px;
+    }
+
+    /* --- PENALTY QUEST SCREEN --- */
     .penalty-hud {
-        padding: 0 12px;
+        padding: 0 10px;
+        flex-direction: column !important;
+        gap: 8px !important;
     }
-    
-    .penalty-alert-banner h1 {
-        font-size: 14px;
+
+    .penalty-alert-banner {
+        width: 100%;
     }
-    
-    .penalty-alert-banner .alert-icon {
-        font-size: 24px;
-    }
-    
+
+    .penalty-alert-banner h1 { font-size: 13px; letter-spacing: 1px; }
+    .penalty-alert-banner .alert-icon { font-size: 22px; }
+    .penalty-alert-banner p { font-size: 9px; }
+
     .penalty-timer-card {
         padding: 6px 12px;
+        width: 100% !important;
+        text-align: center;
     }
-    
-    .penalty-timer-card .value {
-        font-size: 16px;
+
+    .penalty-timer-card .value { font-size: 16px; }
+
+    .penalty-canvas-container {
+        max-width: 100% !important;
     }
-    
-    /* Dynamic database inputs */
-    .input-grid {
-        grid-template-columns: 1fr;
-        gap: 8px;
+
+    /* --- EXAM FULLSCREEN --- */
+    #screen-exam .penalty-hud {
+        flex-direction: column !important;
+        gap: 8px !important;
+        padding-bottom: 10px !important;
     }
-    
-    /* Dungeon controls */
-    .battle-controls {
-        grid-template-columns: 1fr;
+
+    #screen-exam .modal-card {
+        max-width: 100% !important;
+        margin-top: 10px !important;
     }
+
+    #screen-exam .quiz-question-text {
+        font-size: 15px !important;
+        line-height: 1.4 !important;
+    }
+
+    /* --- TOAST NOTIFICATIONS --- */
+    .toast-container {
+        bottom: 70px; /* Above bottom nav */
+        right: 10px;
+        left: 10px;
+        max-width: 100%;
+    }
+
+    .system-toast {
+        padding: 10px 14px;
+    }
+
+    .toast-title { font-size: 10px; }
+    .toast-desc { font-size: 10px; }
+
+    /* --- QUEST CARDS (Daily Gym Trials) --- */
+    .holistic-check-item {
+        gap: 10px;
+    }
+
+    .time-limit-box {
+        padding: 8px 12px;
+    }
+
+    .time-limit-box .label { font-size: 9px; }
+    .time-limit-box .value { font-size: 14px; }
+
+    /* --- LOOT / GACHA CARDS --- */
+    .gacha-card {
+        max-width: 100% !important;
+    }
+
+    .chest-visual-holder { height: 120px; }
+    .chest-opening-animation { font-size: 70px; }
+
+    .reward-card {
+        padding: 20px 16px;
+    }
+
+    .reward-item-icon { font-size: 40px; margin-bottom: 12px; }
+    .reward-item-name { font-size: 16px; }
+    .reward-item-rarity { font-size: 10px; }
+    .reward-item-desc { font-size: 10px; max-width: 240px; }
 }
+
+/* Extra small screens (iPhone SE, small Android) */
+@media (max-width: 380px) {
+    .tab-btn {
+        min-width: 54px !important;
+        padding: 6px 8px 5px 8px !important;
+        font-size: 7px !important;
+    }
+
+    .tab-btn i { font-size: 16px !important; }
+
+    .player-profile-card {
+        grid-template-columns: 48px 1fr;
+        gap: 6px 10px;
+    }
+
+    .avatar-container { width: 48px; height: 48px; }
+    .avatar-icon { font-size: 20px; }
+    .player-name { font-size: 14px; }
+
+    .flashcard-perspective { height: 220px; }
+    .card-main-content { font-size: 14px; }
+
+    .intellectual-hud-banner { padding: 10px; }
+    .iq-score-display { font-size: 24px; }
+}
+

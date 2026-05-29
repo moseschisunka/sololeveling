@@ -745,6 +745,11 @@ function registerEventListeners() {
             if (targetId === "dungeons-tab") {
                 exitActiveBattle();
             }
+
+            // Mobile UX: scroll active tab into view in bottom nav bar
+            tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            // Scroll main content to top for a fresh view
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     });
 
