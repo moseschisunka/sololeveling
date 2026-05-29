@@ -1,0 +1,24 @@
+{
+  "name": "THE SYSTEM: Solo Leveling Gym HUD",
+  "short_name": "THE SYSTEM",
+  "description": "Real-world Solo Leveling accountability HUD for gym tracking and academic trials.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#06080b",
+  "theme_color": "#7a1aff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

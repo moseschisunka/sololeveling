@@ -3094,3 +3094,14 @@ Generate exactly 10 questions (2 per subject). Do not return any conversational 
     const rawJson = data.candidates[0].content.parts[0].text;
     return JSON.parse(rawJson);
 }
+
+// ==========================================================================
+// PROGRESSIVE WEB APP (PWA) SERVICE WORKER PROTOCOL BINDING
+// ==========================================================================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('THE SYSTEM: Service Worker registered successfully.', reg))
+            .catch(err => console.error('THE SYSTEM: Service Worker registration failed.', err));
+    });
+}
