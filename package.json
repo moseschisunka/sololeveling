@@ -1,0 +1,10 @@
+{
+  "name": "solo-leveling-root",
+  "version": "3.0.0",
+  "description": "Root server wrapper for deploying Solo Leveling static HUD to Railway.",
+  "main": "solo-leveling-system/index.html",
+  "scripts": {
+    "start": "npx -y serve -s solo-leveling-system"
+  },
+  "dependencies": {}
+}
